@@ -159,12 +159,10 @@ router.get('/forgetpass', function (req, res, next) {
 });
 
 router.post('/forgetpass', function (req, res, next) {
-	//console.log('req.body');
-	//console.log(req.body);
 	User.findOne({ email: req.body.email }, function (err, data) {
 		console.log(data);
 		if (!data) {
-			res.send({ "Success": "This Email Is not regestered!" });
+			res.send({ "Success": "This Email Is not registered!" });
 		} else {
 			// res.send({"Success":"Success!"});
 			if (req.body.password == req.body.passwordConf) {
@@ -192,7 +190,6 @@ router.get('/add-dataset', isAuthenticated, async (req, res) => {
 		// Fetch license names from MongoDB
 		const License = require('../models/license');
 		const licenses = await License.find({ pending: false }, 'name').exec();
-		console.log('Licenses:', licenses);
 
 		// Render the 'dataset.ejs' template and pass the 'licenses' data
 		res.render('dataset.ejs', { licenses });
@@ -205,10 +202,8 @@ router.get('/add-dataset', isAuthenticated, async (req, res) => {
 
 router.post('/add-dataset', upload.single('csvFile'), async (req, res) => {
 	try {
-		const { name, license } = req.body;
+		const { name, author, year, license } = req.body;
 		const count = 0;
-
-		console.log(req.file); // Log the uploaded file information for debugging
 
 		const License = require('../models/license');
 		const { Dataset } = require('../models/dataset');
@@ -229,13 +224,17 @@ router.post('/add-dataset', upload.single('csvFile'), async (req, res) => {
 
 		// Create the new dataset with the file name
 		const newDataset = new Dataset({
-			name,
+			name: name,
+			author: author,
+			publicationYear: year,
 			fileLink: req.file.originalname,
-			count,
+			count: count,
 			license: foundLicense._id,
 		});
+		console.log(newDataset)
 
 		await newDataset.save();
+
 
 		const localFilePath = path.join(__dirname, '..', 'data', req.file.originalname);
 		fs.writeFileSync(localFilePath, req.file.buffer);

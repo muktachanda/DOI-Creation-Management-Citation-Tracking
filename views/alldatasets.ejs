@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>All Datasets</title>
     <link rel="stylesheet" type="text/css" href="path/to/your/styles.css">
@@ -29,61 +30,122 @@
             padding: 10px;
             z-index: 1;
         }
+
+        .slider-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #f1f1f1;
+            padding: 10px;
+            overflow-x: hidden;
+            white-space: nowrap;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .citation-slider {
+            overflow-x: auto;
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        .citation-card {
+            display: inline-block;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .copy-icon {
+        display: inline-block;
+        margin-left: 5px;
+        cursor: pointer;
+    }
     </style>
 </head>
+
 <body>
-    <% datasets.forEach((dataset) => { %>
-    <div class="card" onclick="showInfo('<%= dataset.license.info %>', '<%= dataset.name %>')">
-        <h2 class="card-title"><%= dataset.name %></h2>
-        <p>File Link: <%= dataset.fileLink %></p>
-        <p style="text-decoration: underline; color: blue;">License: <%= dataset.license.name %></p>
-        <p>
-            Generate Citations:
-            <button onclick="generateCitations('<%= dataset.name %>', 'vancouver', '<%= dataset.fileLink %>')">Vancouver</button>
-            <button onclick="generateCitations('<%= dataset.name %>', 'bibtex', '<%= dataset.fileLink %>')">BibTeX</button>
-            <button onclick="generateCitations('<%= dataset.name %>', 'american', '<%= dataset.fileLink %>')">American</button>
-        </p>
-    </div>
-    <% }); %>
+    <% datasets.forEach((dataset)=> { %>
+        <div class="card" onclick="showInfo('<%= dataset.license.info %>', '<%= dataset.name %>')">
+            <h2 class="card-title">
+                <%= dataset.name %>
+            </h2>
+            <p>Author: <%= dataset.author %>
+            </p>
+            <p>Pulication Year: <%= dataset.publicationYear %>
+            </p>
+            <p>File Link: <%= dataset.fileLink %>
+            </p>
+            <p style="text-decoration: underline; color: blue;">License: <%= dataset.license.name %>
+            </p>
+            <p>
+                Generate Citations:
+                <button
+                    onclick="generateCitations('<%= dataset.name %>','<%= dataset.author %>', '<%= dataset.publicationYear %>', 'vancouver', '<%= dataset.fileLink %>')">Vancouver</button>
+                <button
+                    onclick="generateCitations('<%= dataset.name %>', '<%= dataset.author %>', '<%= dataset.publicationYear %>', 'bibtex', '<%= dataset.fileLink %>')">BibTeX</button>
+                <button
+                    onclick="generateCitations('<%= dataset.name %>', '<%= dataset.author %>', '<%= dataset.publicationYear %>', 'american', '<%= dataset.fileLink %>')">American</button>
+            </p>
+        </div>
+        <% }); %>
 
-    <div id="info-popup" class="info-popup">
-        <p id="license-info"></p>
-    </div>
+            <div class="slider-container">
+                <div class="citation-slider" id="citation-slider"></div>
+            </div>
 
-    <script>
-        function showInfo(info, datasetName) {
-            const infoPopup = document.getElementById("info-popup");
-            const licenseInfo = document.getElementById("license-info");
+            <script>
+                let currentDataset = '';
 
-            licenseInfo.innerHTML = info;
-            infoPopup.style.display = "block";
-            currentDataset = datasetName;
-        }
+                function generateCitations(datasetName, author, year, format, datasetURL) {
+                    const citations = {
+                        'vancouver': `${author}. ${datasetName}. ${year}. URL: ${datasetURL}`,
+                        'bibtex': `@misc{${datasetName},
+                title = {${datasetName}},
+                howpublished = {\\url{${datasetURL}}},
+                year = {${year}}
+            }`,
+                        'american': `${author}. ${year}. ${datasetName}. URL: ${datasetURL}`,
+                    };
 
-        let currentDataset = '';
+                    const formattedCitation = citations[format];
 
-        function generateCitations(datasetName, format, datasetURL) {
-            const publicationYear = new Date().getFullYear();
-            const citations = {
-                'vancouver': `Author(s). ${datasetName}. ${publicationYear}. URL: ${datasetURL}`,
-                'bibtex': `@misc{${datasetName},
-        title = {${datasetName}},
-        howpublished = {\\url{${datasetURL}}},
-        year = {${publicationYear}}
-        }`,
-                'american': `Author(s). ${publicationYear}. ${datasetName}. URL: ${datasetURL}`,
-            };
+                    if (formattedCitation) {
+                        const citationSlider = document.getElementById("citation-slider");
+                        citationSlider.innerHTML = '';
+                        
+                        const citationCard = document.createElement("div");
+                        citationCard.className = "citation-card";
 
-            const formattedCitation = citations[format];
+                        const citationText = document.createElement("span");
+                        citationText.textContent = formattedCitation;
+                        citationCard.appendChild(citationText);
 
-            if (formattedCitation) {
-                const citationPopup = window.open('', '_blank');
-                citationPopup.document.write(`<pre>${formattedCitation}</pre>`);
-                citationPopup.document.close();
-            } else {
-                alert('Unsupported citation format.');
-            }
-        }
-    </script>
+                        const copyIcon = document.createElement("span");
+                        copyIcon.className = "copy-icon";
+                        copyIcon.textContent = "📋"; // Unicode for clipboard icon
+                        copyIcon.addEventListener("click", () => copyToClipboard(formattedCitation));
+                        citationCard.appendChild(copyIcon);
+
+                        citationSlider.appendChild(citationCard);
+                    } else {
+                        alert('Unsupported citation format.');
+                    }
+                }
+
+                function copyToClipboard(text) {
+                    const tempInput = document.createElement("textarea");
+                    tempInput.value = text;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(tempInput);
+                    alert("Citation copied to clipboard!");
+                }
+            </script>
 </body>
+
 </html>
