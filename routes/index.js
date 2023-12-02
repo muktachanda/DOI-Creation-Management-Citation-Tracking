@@ -1,4 +1,5 @@
 var express = require('express');
+var app = express()
 var router = express.Router();
 var User = require('../models/user');
 var License = require('../models/license');
@@ -244,6 +245,18 @@ router.post('/add-dataset', upload.single('csvFile'), async (req, res) => {
 		console.error('Error creating dataset:', err);
 		res.status(500).send('Internal Server Error');
 	}
+});
+
+router.get('/openFile/:filename', (req, res) => {
+    const filename = req.params.filename;
+    const filePath = path.join(__dirname, '..', 'data', filename);
+
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send('Error opening the file.');
+        }
+    });
 });
 
 

@@ -60,26 +60,37 @@
         }
 
         .copy-icon {
-        display: inline-block;
-        margin-left: 5px;
-        cursor: pointer;
-    }
+            display: inline-block;
+            margin-left: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 
 <body>
     <% datasets.forEach((dataset)=> { %>
-        <div class="card" onclick="showInfo('<%= dataset.license.info %>', '<%= dataset.name %>')">
+        <div class="card">
             <h2 class="card-title">
                 <%= dataset.name %>
             </h2>
             <p>Author: <%= dataset.author %>
             </p>
-            <p>Pulication Year: <%= dataset.publicationYear %>
-            </p>
-            <p>File Link: <%= dataset.fileLink %>
-            </p>
-            <p style="text-decoration: underline; color: blue;">License: <%= dataset.license.name %>
+            <p>Publication Year: <%= dataset.publicationYear %>
+                    <p>
+                        <span style="text-decoration: none; color: inherit;">File Link: </span>
+                        <span style="text-decoration: underline; color: blue;"
+                            onclick="openCSVFile('<%= dataset.fileLink %>')">
+                            <%= dataset.fileLink %>
+                        </span>
+                    </p>
+                    <p>
+                        <span style="text-decoration: none; color: inherit;">License: </span>
+                        <span style="text-decoration: underline; color: blue;"
+                            onclick="openLicenseURL('<%= dataset.license.info %>')">
+                            <%= dataset.license.name %>
+                        </span>
+                    </p>
+
             </p>
             <p>
                 Generate Citations:
@@ -116,7 +127,7 @@
                     if (formattedCitation) {
                         const citationSlider = document.getElementById("citation-slider");
                         citationSlider.innerHTML = '';
-                        
+
                         const citationCard = document.createElement("div");
                         citationCard.className = "citation-card";
 
@@ -145,6 +156,17 @@
                     document.body.removeChild(tempInput);
                     alert("Citation copied to clipboard!");
                 }
+
+                function openLicenseURL(url) {
+                    window.open(url, '_blank');
+                }
+
+                function openCSVFile(filename) {
+                    const fileURL = `/openFile/${filename}`;
+                    console.log('File URL', fileURL);
+                    window.open(fileURL, '_blank');
+                }
+
             </script>
 </body>
 
