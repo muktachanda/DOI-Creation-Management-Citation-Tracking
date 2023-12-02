@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>All Research Papers</title>
+    <link rel="stylesheet" type="text/css" href="path/to/your/styles.css">
+    <style>
+        /* Additional CSS styles for the card view */
+        .card {
+            max-width: 400px;
+            margin: 10px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
+        .card-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .info-popup {
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 10px;
+            z-index: 1;
+        }
+
+    </style>
+</head>
+
+<body>
+    <% papers.forEach((paper)=> { %>
+        <div class="card">
+            <h2 class="card-title">
+                <%= paper.name %>
+            </h2>
+                    <p>
+                        <span style="text-decoration: none; color: inherit;">File Link: </span>
+                        <span style="text-decoration: underline; color: blue;"
+                            onclick="openPDFFile('<%= paper.fileLink %>')">
+                            <%= paper.fileLink %>
+                        </span>
+                    </p>
+            </p>
+            <% }); %>
+
+            <script>
+
+                function openPDFFile(filename) {
+                    const fileURL = `/openPaper/${filename}`;
+                    console.log('File URL', fileURL);
+                    window.open(fileURL, '_blank');
+                }
+
+            </script>
+</body>
+
+</html>

@@ -10,6 +10,7 @@ const datasetSchema = new mongoose.Schema({
   fileLink: String,
   count: Number,
   license: { type: mongoose.Schema.Types.ObjectId, ref: 'License' },
+  doi: String,
 });
 
 const Dataset = mongoose.model('Dataset', datasetSchema);

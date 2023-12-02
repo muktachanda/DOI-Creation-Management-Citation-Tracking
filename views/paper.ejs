@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Research Paper</title>
+    <link rel="stylesheet" type="text/css" href="path/to/your/styles.css">
+    <style>
+        /* Additional CSS styles for the card view */
+        .card {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-body {
+            text-align: center;
+        }
+
+        .card-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="card-body">
+            <h1 class="card-title">Add Research Paper</h1>
+            <form method="POST" action="/add-paper" enctype="multipart/form-data"> 
+                <label for="name">Name:</label>
+                <input type="text" name="name" required><br>
+
+                <label for="csvFile">Upload PDF:</label>
+                <input type="file" name="pdfFile" accept=".pdf" required><br> 
+
+                <button type="submit">Add Dataset</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    </script>
+</body>
+</html>

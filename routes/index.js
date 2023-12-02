@@ -223,6 +223,15 @@ router.post('/add-dataset', upload.single('csvFile'), async (req, res) => {
 			return;
 		}
 
+		const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+		const doiLength = 10;
+	
+		let doi = 'doi:';
+		for (let i = 0; i < doiLength; i++) {
+			const randomIndex = Math.floor(Math.random() * characters.length);
+			doi += characters.charAt(randomIndex);
+		}
+
 		// Create the new dataset with the file name
 		const newDataset = new Dataset({
 			name: name,
@@ -231,6 +240,7 @@ router.post('/add-dataset', upload.single('csvFile'), async (req, res) => {
 			fileLink: req.file.originalname,
 			count: count,
 			license: foundLicense._id,
+			doi: doi,
 		});
 		console.log(newDataset)
 
@@ -247,7 +257,7 @@ router.post('/add-dataset', upload.single('csvFile'), async (req, res) => {
 	}
 });
 
-router.get('/openFile/:filename', (req, res) => {
+router.get('/openDataset/:filename', (req, res) => {
     const filename = req.params.filename;
     const filePath = path.join(__dirname, '..', 'data', filename);
 
@@ -299,6 +309,73 @@ router.get('/datasets', isAuthenticated, async (req, res) => {
 		console.error('Error loading datasets:', err);
 		res.status(500).send('Internal Server Error');
 	}
+});
+
+router.get('/add-paper', isAuthenticated, async (req, res) => {
+	try {
+		res.render('paper.ejs');
+	} catch (err) {
+		console.error('Error fetching research papers:', err);
+		res.status(500).send('Internal Server Error');
+	}
+});
+
+router.post('/add-paper', upload.single('pdfFile'), async (req, res) => {
+	try {
+		const { name } = req.body;
+		const { ResearchPaper } = require('../models/paper');
+
+		// Check if file is uploaded
+		if (!req.file) {
+			res.status(400).send('No file uploaded');
+			return;
+		}
+
+		// Create the new dataset with the file name
+		const newPaper = new ResearchPaper({
+			name: name,
+			fileLink: req.file.originalname,
+		});
+		console.log(newPaper);
+
+		await newPaper.save();
+
+
+		const localFilePath = path.join(__dirname, '..', 'papers', req.file.originalname);
+		fs.writeFileSync(localFilePath, req.file.buffer);
+
+		res.status(200).send('Research Paper added successfully');
+	} catch (err) {
+		console.error('Error creating research paper:', err);
+		res.status(500).send('Internal Server Error');
+	}
+});
+
+router.get('/researchpapers', isAuthenticated, async (req, res) => {
+	try {
+		// Retrieve all datasets, populating the 'license' field to get license details
+		const { ResearchPaper } = require('../models/paper');
+		const papers = await ResearchPaper.find().exec();
+		console.log(papers);
+
+		res.render("allpapers.ejs", { papers });
+	} catch (err) {
+		console.error('Error loading papers:', err);
+		res.status(500).send('Internal Server Error');
+	}
+});
+
+
+router.get('/openPaper/:filename', (req, res) => {
+    const filename = req.params.filename;
+    const filePath = path.join(__dirname, '..', 'papers', filename);
+
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send('Error opening the file.');
+        }
+    });
 });
 
 
