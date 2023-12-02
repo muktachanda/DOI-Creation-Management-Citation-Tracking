@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="./css/main.css">
+    <style>
+        /* Add custom CSS styles for the tabs and content */
+        .tab-content {
+            padding: 20px;
+        }
+    </style>
+    <script>
+        // JavaScript to show/hide tab content
+        $(document).ready(function () {
+            $('.nav-pills a').click(function () {
+                // Hide all tab content
+                $('.tab-content .tab-pane').hide();
+                // Show the selected tab content
+                $($(this).attr('href')).show();
+            });
+            // Show the content of the initially selected tab
+            var initialTab = $('.nav-pills .active a').attr('href');
+            $(initialTab).show();
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <ul class="nav nav-pills nav-stacked">
+                    <li class="active"><a data-toggle="tab" href="#addDataset">Add Dataset</a></li>
+                    <li><a data-toggle="tab" href="#addResearchPaper">Add Research Paper</a></li>
+                    <li><a data-toggle="tab" href="#existingDatasets">Existing Datasets</a></li>
+                    <li><a data-toggle="tab" href="#logout">Logout</a></li>
+                </ul>
+            </div>
+            <div class="col-md-9">
+                <div class="tab-content">
+                    <!-- Add Dataset Tab -->
+                    <div id="addDataset" class="tab-pane fade in active">
+						<a href="/add-dataset">Add Dataset</a>
+					  </div>					  
+
+                    <!-- Add Research Paper Tab -->
+                    <div id="addResearchPaper" class="tab-pane fade">
+                        <h3>Add Research Paper</h3>
+                        <!-- Add your content for the "Add Research Paper" tab here -->
+                    </div>
+
+                    <!-- Existing Datasets Tab -->
+                    <div id="existingDatasets" class="tab-pane fade">
+                        <a href="/datasets">Existing Datasets</h3>
+                        <!-- Add your content for the "Existing Datasets" tab here -->
+                    </div>
+
+                    <div id="logout" class="tab-pane fade">
+                        <h3>Logout</h3>
+                        <div class="abc">
+							<a href="/logout">Logout</a>
+						</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

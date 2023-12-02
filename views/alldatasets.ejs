@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Datasets</title>
+    <link rel="stylesheet" type="text/css" href="path/to/your/styles.css">
+    <style>
+        /* Additional CSS styles for the card view */
+        .card {
+            max-width: 400px;
+            margin: 10px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
+        .card-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .info-popup {
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 10px;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <% datasets.forEach((dataset) => { %>
+    <div class="card" onclick="showInfo('<%= dataset.license.info %>', '<%= dataset.name %>')">
+        <h2 class="card-title"><%= dataset.name %></h2>
+        <p>File Link: <%= dataset.fileLink %></p>
+        <p style="text-decoration: underline; color: blue;">License: <%= dataset.license.name %></p>
+        <p>
+            Generate Citations:
+            <button onclick="generateCitations('<%= dataset.name %>', 'vancouver', '<%= dataset.fileLink %>')">Vancouver</button>
+            <button onclick="generateCitations('<%= dataset.name %>', 'bibtex', '<%= dataset.fileLink %>')">BibTeX</button>
+            <button onclick="generateCitations('<%= dataset.name %>', 'american', '<%= dataset.fileLink %>')">American</button>
+        </p>
+    </div>
+    <% }); %>
+
+    <div id="info-popup" class="info-popup">
+        <p id="license-info"></p>
+    </div>
+
+    <script>
+        function showInfo(info, datasetName) {
+            const infoPopup = document.getElementById("info-popup");
+            const licenseInfo = document.getElementById("license-info");
+
+            licenseInfo.innerHTML = info;
+            infoPopup.style.display = "block";
+            currentDataset = datasetName;
+        }
+
+        let currentDataset = '';
+
+        function generateCitations(datasetName, format, datasetURL) {
+            const publicationYear = new Date().getFullYear();
+            const citations = {
+                'vancouver': `Author(s). ${datasetName}. ${publicationYear}. URL: ${datasetURL}`,
+                'bibtex': `@misc{${datasetName},
+        title = {${datasetName}},
+        howpublished = {\\url{${datasetURL}}},
+        year = {${publicationYear}}
+        }`,
+                'american': `Author(s). ${publicationYear}. ${datasetName}. URL: ${datasetURL}`,
+            };
+
+            const formattedCitation = citations[format];
+
+            if (formattedCitation) {
+                const citationPopup = window.open('', '_blank');
+                citationPopup.document.write(`<pre>${formattedCitation}</pre>`);
+                citationPopup.document.close();
+            } else {
+                alert('Unsupported citation format.');
+            }
+        }
+    </script>
+</body>
+</html>

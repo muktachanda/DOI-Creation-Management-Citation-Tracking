@@ -1,0 +1,93 @@
+/*body,
+ table,
+    thead,
+    tr,
+    tbody,
+    th,
+    td {
+        text-align: center;
+    }*/
+body{
+	text-align: center !important;
+}
+p{
+	margin-top: 20px;
+	font-size: 30px;
+}
+input{
+	text-align: center;
+}
+.mssg{
+	margin-top: 5px;
+	margin-bottom: 5px;
+	border-radius: 5px;
+}
+
+
+.nav-pills {
+    border-radius: 0; 
+}
+
+.nav-pills > li > a {
+    border-radius: 0; 
+}
+
+.tab-content {
+    background-color: #f5f5f5; 
+    padding: 20px;
+}
+
+#addDataset {
+    background-color: #fff; 
+    border: 1px solid #ddd; 
+    padding: 20px;
+}
+
+#addResearchPaper {
+    background-color: #fff; 
+    border: 1px solid #ddd; 
+    padding: 20px;
+}
+
+#existingDatasets {
+    background-color: #fff; 
+    border: 1px solid #ddd; 
+    padding: 20px;
+}
+
+/* CSS for the tabbed interface */
+.nav-stacked {
+    background-color: #f8f8f8;
+    padding: 10px;
+}
+
+.nav-stacked li {
+    margin-bottom: 10px;
+}
+
+.nav-stacked a {
+    text-decoration: none;
+    color: #333;
+    padding: 5px 15px;
+    border-radius: 5px;
+    display: block;
+    transition: background-color 0.3s;
+}
+
+.nav-stacked a:hover {
+    background-color: #337ab7;
+    color: #fff;
+}
+
+.tab-content {
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.nav-stacked .active a {
+    background-color: #337ab7;
+    color: #fff;
+}
+
