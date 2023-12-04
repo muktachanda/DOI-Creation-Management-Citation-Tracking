@@ -1,73 +1,112 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Welcome</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dataset Portal Dashboard</title>
+    <!-- Bootstrap CSS theme link -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- Custom CSS link -->
     <link rel="stylesheet" href="./css/main.css">
     <style>
-        /* Add custom CSS styles for the tabs and content */
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container-fluid {
+            margin-top: 20px;
+            padding-left: 0;
+        }
+
+        .nav-pills {
+            background-color: #343a40;
+            border-radius: 0;
+            padding: 10px;
+            position: fixed;
+            height: 100%;
+        }
+
+        .nav-pills > li > a {
+            color: #ffffff;
+            border-radius: 0;
+            margin-bottom: 5px;
+            display: block;
+            padding: 10px;
+        }
+
+        .nav-pills > li > a:hover,
+        .nav-pills > li > a:focus {
+            background-color: #007bff;
+        }
+
         .tab-content {
+            background-color: #ffffff;
+            border-radius: 0;
+            box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.1);
             padding: 20px;
+            margin-left: 220px; /* Adjusted margin for the tab content */
+        }
+
+        .tab-pane a {
+            display: block;
+            padding: 10px 0;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .tab-pane a:hover {
+            background-color: #e6f7ff;
         }
     </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script>
-        // JavaScript to show/hide tab content
         $(document).ready(function () {
             $('.nav-pills a').click(function () {
-                // Hide all tab content
                 $('.tab-content .tab-pane').hide();
-                // Show the selected tab content
                 $($(this).attr('href')).show();
             });
-            // Show the content of the initially selected tab
             var initialTab = $('.nav-pills .active a').attr('href');
             $(initialTab).show();
         });
     </script>
 </head>
 <body>
+    <div class="container-fluid">
+        <ul class="nav nav-pills nav-stacked">
+            <li class="active"><a data-toggle="tab" href="#addDataset">Add Dataset</a></li>
+            <li><a data-toggle="tab" href="#addResearchPaper">Add Research Paper</a></li>
+            <li><a data-toggle="tab" href="#existingDatasets">All Datasets</a></li>
+            <li><a data-toggle="tab" href="#existingResearchPapers">All Research Papers</a></li>
+            <li><a data-toggle="tab" href="#logout">Logout</a></li>
+        </ul>
+    </div>
+
     <div class="container">
-        <div class="row">
-            <div class="col-md-3">
-                <ul class="nav nav-pills nav-stacked">
-                    <li class="active"><a data-toggle="tab" href="#addDataset">Add Dataset</a></li>
-                    <li><a data-toggle="tab" href="#addResearchPaper">Add Research Paper</a></li>
-                    <li><a data-toggle="tab" href="#existingDatasets">All Datasets</a></li>
-                    <li><a data-toggle="tab" href="#existingResearchPapers">All Research Papers</a></li>
-                    <li><a data-toggle="tab" href="#logout">Logout</a></li>
-                </ul>
+        <div class="tab-content">
+            <!-- Add Dataset Tab -->
+            <div id="addDataset" class="tab-pane fade in active">
+                <a href="/add-dataset">Add Dataset</a>
             </div>
-            <div class="col-md-9">
-                <div class="tab-content">
-                    <!-- Add Dataset Tab -->
-                    <div id="addDataset" class="tab-pane fade in active">
-						<a href="/add-dataset">Add Dataset</a>
-					  </div>					  
 
-                    <!-- Add Research Paper Tab -->
-                    <div id="addResearchPaper" class="tab-pane fade">
-                        <a href="/add-paper">Add Research Paper</a>
-                    </div>
+            <!-- Add Research Paper Tab -->
+            <div id="addResearchPaper" class="tab-pane fade">
+                <a href="/add-paper">Add Research Paper</a>
+            </div>
 
-                    <!-- Existing Datasets Tab -->
-                    <div id="existingDatasets" class="tab-pane fade">
-                        <a href="/datasets">Existing Datasets</h3>
-                    </div>
+            <!-- Existing Datasets Tab -->
+            <div id="existingDatasets" class="tab-pane fade">
+                <a href="/datasets">Existing Datasets</a>
+            </div>
 
-                    <!-- Existing Research Papers Tab -->
-                    <div id="existingResearchPapers" class="tab-pane fade">
-                        <a href="/researchpapers">Existing Research Papers</h3>
-                    </div>
+            <!-- Existing Research Papers Tab -->
+            <div id="existingResearchPapers" class="tab-pane fade">
+                <a href="/researchpapers">Existing Research Papers</a>
+            </div>
 
-                    <div id="logout" class="tab-pane fade">
-                        <h3>Logout</h3>
-                        <div class="abc">
-							<a href="/logout">Logout</a>
-						</div>
-                    </div>
-                </div>
+            <!-- Logout Tab -->
+            <div id="logout" class="tab-pane fade">
+                <a href="/logout">Logout</a>
             </div>
         </div>
     </div>

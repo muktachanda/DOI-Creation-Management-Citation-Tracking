@@ -226,7 +226,7 @@ router.post('/add-dataset', upload.single('csvFile'), async (req, res) => {
 		const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 		const doiLength = 10;
 	
-		let doi = 'doi:';
+		let doi = 'doi:10//';
 		for (let i = 0; i < doiLength; i++) {
 			const randomIndex = Math.floor(Math.random() * characters.length);
 			doi += characters.charAt(randomIndex);

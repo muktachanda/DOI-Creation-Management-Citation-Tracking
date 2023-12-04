@@ -1,64 +1,94 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Research Papers</title>
-    <link rel="stylesheet" type="text/css" href="path/to/your/styles.css">
     <style>
-        /* Additional CSS styles for the card view */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            font-size: 24px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            width: 100%;
+        }
+
         .card {
             max-width: 400px;
             margin: 10px;
             padding: 20px;
             background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
         }
 
         .card-title {
             font-size: 18px;
             margin-bottom: 10px;
+            color: #333;
         }
 
-        .info-popup {
-            display: none;
-            position: absolute;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            padding: 10px;
-            z-index: 1;
+        .file-link {
+            margin-top: 10px;
+            color: #007bff;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
         }
 
+        .file-link:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 
 <body>
-    <% papers.forEach((paper)=> { %>
-        <div class="card">
-            <h2 class="card-title">
-                <%= paper.name %>
-            </h2>
-                    <p>
-                        <span style="text-decoration: none; color: inherit;">File Link: </span>
-                        <span style="text-decoration: underline; color: blue;"
-                            onclick="openPDFFile('<%= paper.fileLink %>')">
-                            <%= paper.fileLink %>
-                        </span>
-                    </p>
-            </p>
-            <% }); %>
+    <div class="header">
+        All Research Papers
+    </div>
 
-            <script>
+    <% papers.forEach((paper) => { %>
+    <div class="card">
+        <h2 class="card-title">
+            <%= paper.name %>
+        </h2>
+        <p>
+            <strong>File Link:</strong>
+            <a class="file-link" onclick="openPDFFile('<%= paper.fileLink %>')">
+                <%= paper.fileLink %>
+            </a>
+        </p>
+    </div>
+    <% }); %>
 
-                function openPDFFile(filename) {
-                    const fileURL = `/openPaper/${filename}`;
-                    console.log('File URL', fileURL);
-                    window.open(fileURL, '_blank');
-                }
-
-            </script>
+    <script>
+        function openPDFFile(filename) {
+            const fileURL = `/openPaper/${filename}`;
+            console.log('File URL', fileURL);
+            window.open(fileURL, '_blank');
+        }
+    </script>
 </body>
 
 </html>

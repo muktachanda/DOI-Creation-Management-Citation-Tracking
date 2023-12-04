@@ -1,18 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Dataset</title>
     <link rel="stylesheet" type="text/css" href="path/to/your/styles.css">
     <style>
-        /* Additional CSS styles for the card view */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            font-size: 24px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            width: 100%;
+        }
+
         .card {
             max-width: 400px;
-            margin: 0 auto;
             padding: 20px;
             background-color: #fff;
             border: 1px solid #ccc;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
         }
 
         .card-body {
@@ -22,25 +44,66 @@
         .card-title {
             font-size: 24px;
             margin-bottom: 20px;
+            color: #007bff;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #customLicenseLink {
+            color: #007bff;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        #customLicenseLink:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
+    <div class="header">Add Dataset</div>
     <div class="card">
         <div class="card-body">
-            <h1 class="card-title">Add Dataset</h1>
-            <form method="POST" action="/add-dataset" enctype="multipart/form-data"> 
+            <form method="POST" action="/add-dataset" enctype="multipart/form-data">
                 <label for="name">Name:</label>
-                <input type="text" name="name" required><br>
+                <input type="text" name="name" required>
 
                 <label for="author">Author:</label>
-                <input type="text" name="author" required><br>
+                <input type="text" name="author" required>
 
                 <label for="year">Publication Year:</label>
-                <input type="number" name="year" required><br>
+                <input type="number" name="year" required>
 
                 <label for="csvFile">Upload CSV File:</label>
-                <input type="file" name="csvFile" accept=".csv" required><br> 
+                <input type="file" name="csvFile" accept=".csv" required>
 
                 <label for="license">Choose a License:</label>
                 <select name="license">
@@ -48,16 +111,13 @@
                     <% licenses.forEach((license) => { %>
                         <option value="<%= license.name.trim() %>"><%= license.name %></option>
                     <% }); %>
-                </select><br>
+                </select>
 
-                <a href="/custom-license" id="customLicenseLink">Create a Custom License</a><br>
+                <a href="/custom-license" id="customLicenseLink">Create a Custom License</a>
 
                 <button type="submit">Add Dataset</button>
             </form>
         </div>
     </div>
-
-    <script>
-    </script>
 </body>
 </html>

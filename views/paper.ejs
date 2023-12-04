@@ -1,13 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Research Paper</title>
-    <link rel="stylesheet" type="text/css" href="path/to/your/styles.css">
     <style>
-        /* Additional CSS styles for the card view */
+         body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            font-size: 24px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            width: 100%;
+        }
+
         .card {
             max-width: 400px;
-            margin: 0 auto;
             padding: 20px;
             background-color: #fff;
             border: 1px solid #ccc;
@@ -22,26 +44,52 @@
         .card-title {
             font-size: 24px;
             margin-bottom: 20px;
+            color: #007bff;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
+    <div class="header">Add Research Paper</div><br><br>
     <div class="card">
         <div class="card-body">
-            <h1 class="card-title">Add Research Paper</h1>
-            <form method="POST" action="/add-paper" enctype="multipart/form-data"> 
+            <form method="POST" action="/add-paper" enctype="multipart/form-data">
                 <label for="name">Name:</label>
-                <input type="text" name="name" required><br>
+                <input type="text" name="name" required>
 
-                <label for="csvFile">Upload PDF:</label>
-                <input type="file" name="pdfFile" accept=".pdf" required><br> 
+                <label for="pdfFile">Upload PDF:</label>
+                <input type="file" name="pdfFile" accept=".pdf" required>
 
-                <button type="submit">Add Dataset</button>
+                <button type="submit">Add Research Paper</button>
             </form>
         </div>
     </div>
-
-    <script>
-    </script>
 </body>
 </html>

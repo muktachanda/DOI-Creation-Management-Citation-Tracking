@@ -1,11 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Datasets</title>
-    <link rel="stylesheet" type="text/css" href="path/to/your/styles.css">
     <style>
-        /* Additional CSS styles for the card view */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            font-size: 24px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            width: 100%;
+        }
+
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+        }
+
         .card {
             max-width: 400px;
             margin: 10px;
@@ -15,11 +43,21 @@
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
         }
 
         .card-title {
             font-size: 18px;
             margin-bottom: 10px;
+            color: #007bff;
+        }
+
+        .card-info {
+            color: #333;
         }
 
         .info-popup {
@@ -68,29 +106,28 @@
 </head>
 
 <body>
-    <% datasets.forEach((dataset)=> { %>
+    <div class="header">All Datasets</div>
+    <div class="card-container">
+        <% datasets.forEach((dataset) => { %>
         <div class="card">
             <h2 class="card-title">
                 <%= dataset.name %>
             </h2>
-            <p>Author: <%= dataset.author %>
+            <p class="card-info">Author: <%= dataset.author %></p>
+            <p class="card-info">Publication Year: <%= dataset.publicationYear %></p>
+            <p class="card-info">
+                <span style="text-decoration: none; color: inherit;">File Link: </span>
+                <span style="text-decoration: underline; color: blue;"
+                    onclick="openCSVFile('<%= dataset.fileLink %>')">
+                    <%= dataset.fileLink %>
+                </span>
             </p>
-            <p>Publication Year: <%= dataset.publicationYear %>
-                    <p>
-                        <span style="text-decoration: none; color: inherit;">File Link: </span>
-                        <span style="text-decoration: underline; color: blue;"
-                            onclick="openCSVFile('<%= dataset.fileLink %>')">
-                            <%= dataset.fileLink %>
-                        </span>
-                    </p>
-                    <p>
-                        <span style="text-decoration: none; color: inherit;">License: </span>
-                        <span style="text-decoration: underline; color: blue;"
-                            onclick="openLicenseURL('<%= dataset.license.info %>')">
-                            <%= dataset.license.name %>
-                        </span>
-                    </p>
-
+            <p class="card-info">
+                <span style="text-decoration: none; color: inherit;">License: </span>
+                <span style="text-decoration: underline; color: blue;"
+                    onclick="openLicenseURL('<%= dataset.license.info %>')">
+                    <%= dataset.license.name %>
+                </span>
             </p>
             <p>
                 Generate Citations:
@@ -103,71 +140,72 @@
             </p>
         </div>
         <% }); %>
+    </div>
 
-            <div class="slider-container">
-                <div class="citation-slider" id="citation-slider"></div>
-            </div>
+    <div class="slider-container">
+        <div class="citation-slider" id="citation-slider"></div>
+    </div>
 
-            <script>
-                let currentDataset = '';
+    <script>
+        let currentDataset = '';
 
-                function generateCitations(datasetName, author, year, format, datasetURL) {
-                    const citations = {
-                        'vancouver': `${author}. ${datasetName}. ${year}. URL: ${datasetURL}`,
-                        'bibtex': `@misc{${datasetName},
-                title = {${datasetName}},
-                howpublished = {\\url{${datasetURL}}},
-                year = {${year}}
-            }`,
-                        'american': `${author}. ${year}. ${datasetName}. URL: ${datasetURL}`,
-                    };
+        function generateCitations(datasetName, author, year, format, datasetURL) {
+            const citations = {
+                'vancouver': `${author}. ${datasetName}. ${year}. URL: ${datasetURL}`,
+                'bibtex': `@misc{${datasetName},
+                    title = {${datasetName}},
+                    howpublished = {\\url{${datasetURL}}},
+                    year = {${year}}
+                }`,
+                'american': `${author}. ${year}. ${datasetName}. URL: ${datasetURL}`,
+            };
 
-                    const formattedCitation = citations[format];
+            const formattedCitation = citations[format];
 
-                    if (formattedCitation) {
-                        const citationSlider = document.getElementById("citation-slider");
-                        citationSlider.innerHTML = '';
+            if (formattedCitation) {
+                const citationSlider = document.getElementById("citation-slider");
+                citationSlider.innerHTML = '';
 
-                        const citationCard = document.createElement("div");
-                        citationCard.className = "citation-card";
+                const citationCard = document.createElement("div");
+                citationCard.className = "citation-card";
 
-                        const citationText = document.createElement("span");
-                        citationText.textContent = formattedCitation;
-                        citationCard.appendChild(citationText);
+                const citationText = document.createElement("span");
+                citationText.textContent = formattedCitation;
+                citationCard.appendChild(citationText);
 
-                        const copyIcon = document.createElement("span");
-                        copyIcon.className = "copy-icon";
-                        copyIcon.textContent = "📋"; // Unicode for clipboard icon
-                        copyIcon.addEventListener("click", () => copyToClipboard(formattedCitation));
-                        citationCard.appendChild(copyIcon);
+                const copyIcon = document.createElement("span");
+                copyIcon.className = "copy-icon";
+                copyIcon.textContent = "📋"; // Unicode for clipboard icon
+                copyIcon.addEventListener("click", () => copyToClipboard(formattedCitation));
+                citationCard.appendChild(copyIcon);
 
-                        citationSlider.appendChild(citationCard);
-                    } else {
-                        alert('Unsupported citation format.');
-                    }
-                }
+                citationSlider.appendChild(citationCard);
+            } else {
+                alert('Unsupported citation format.');
+            }
+        }
 
-                function copyToClipboard(text) {
-                    const tempInput = document.createElement("textarea");
-                    tempInput.value = text;
-                    document.body.appendChild(tempInput);
-                    tempInput.select();
-                    document.execCommand("copy");
-                    document.body.removeChild(tempInput);
-                    alert("Citation copied to clipboard!");
-                }
+        function copyToClipboard(text) {
+            const tempInput = document.createElement("textarea");
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            alert("Citation copied to clipboard!");
+        }
 
-                function openLicenseURL(url) {
-                    window.open(url, '_blank');
-                }
+        function openLicenseURL(url) {
+            window.open(url, '_blank');
+        }
 
-                function openCSVFile(filename) {
-                    const fileURL = `/openDataset/${filename}`;
-                    console.log('File URL', fileURL);
-                    window.open(fileURL, '_blank');
-                }
+        function openCSVFile(filename) {
+            const fileURL = `/openDataset/${filename}`;
+            console.log('File URL', fileURL);
+            window.open(fileURL, '_blank');
+        }
 
-            </script>
+    </script>
 </body>
 
 </html>
