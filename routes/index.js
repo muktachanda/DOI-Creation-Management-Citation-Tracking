@@ -3,10 +3,11 @@ var app = express()
 var router = express.Router();
 var User = require('../models/user');
 var License = require('../models/license');
-var Dataset = require('../models/dataset');
+var {Dataset} = require('../models/dataset');
 const {gfs, upload} = require('../server');
 const path = require('path');
 var fs = require('fs');
+const { getDOIsFromPDF } = require('../util/pdfUtils');
 
 router.get('/', function (req, res, next) {
 	return res.render('index.ejs');
@@ -118,7 +119,8 @@ router.post('/admin/accept-license/:id', async (req, res) => {
 		const License = require('../models/license');
 		await License.findByIdAndUpdate(licenseId, { pending: false });
 
-		res.redirect('/admin');
+		const licenses = await License.find({ pending: true });
+		return res.render('admin.ejs', { licenses });
 	} catch (err) {
 		console.error('Error accepting license:', err);
 		res.status(500).send('Internal Server Error');
@@ -126,18 +128,19 @@ router.post('/admin/accept-license/:id', async (req, res) => {
 });
 
 router.post('/admin/deny-license/:id', async (req, res) => {
-	try {
-		const licenseId = req.params.id;
+    try {
+        const licenseId = req.params.id;
 
-		// Update the license's pending status to false
-		const License = require('../models/license');
-		await License.findByIdAndUpdate(licenseId, { pending: false });
+        // Remove the license
+        const License = require('../models/license');
+        await License.findByIdAndRemove(licenseId);
 
-		res.redirect('/admin');
-	} catch (err) {
-		console.error('Error denying license:', err);
-		res.status(500).send('Internal Server Error');
-	}
+        const licenses = await License.find({ pending: true });
+		return res.render('admin.ejs', { licenses });
+    } catch (err) {
+        console.error('Error denying license:', err);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
 
@@ -226,7 +229,7 @@ router.post('/add-dataset', upload.single('csvFile'), async (req, res) => {
 		const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 		const doiLength = 10;
 	
-		let doi = 'doi:10//';
+		let doi = 'doi:';
 		for (let i = 0; i < doiLength; i++) {
 			const randomIndex = Math.floor(Math.random() * characters.length);
 			doi += characters.charAt(randomIndex);
@@ -321,34 +324,40 @@ router.get('/add-paper', isAuthenticated, async (req, res) => {
 });
 
 router.post('/add-paper', upload.single('pdfFile'), async (req, res) => {
-	try {
-		const { name } = req.body;
-		const { ResearchPaper } = require('../models/paper');
+    try {
+        const { name } = req.body;
 
-		// Check if file is uploaded
-		if (!req.file) {
-			res.status(400).send('No file uploaded');
-			return;
-		}
+        // Check if file is uploaded
+        if (!req.file) {
+            res.status(400).send('No file uploaded');
+            return;
+        }
+		
+		const {ResearchPaper} = require('../models/paper');
+        // Create the new paper with the file name
+        const newPaper = new ResearchPaper({
+            name: name,
+            fileLink: req.file.originalname,
+        });
 
-		// Create the new dataset with the file name
-		const newPaper = new ResearchPaper({
-			name: name,
-			fileLink: req.file.originalname,
-		});
-		console.log(newPaper);
+        await newPaper.save();
 
-		await newPaper.save();
+        const localFilePath = path.join(__dirname, '..', 'papers', req.file.originalname);
+        fs.writeFileSync(localFilePath, req.file.buffer);
 
+        // Extract DOI from the PDF
+        const dois = await getDOIsFromPDF(localFilePath);
 
-		const localFilePath = path.join(__dirname, '..', 'papers', req.file.originalname);
-		fs.writeFileSync(localFilePath, req.file.buffer);
+        // Update datasets with the matching DOI
+        if (dois) {
+            await Dataset.updateMany({ doi: { $in: dois } }, { $inc: { count: 1 } });
+        }
 
-		res.status(200).send('Research Paper added successfully');
-	} catch (err) {
-		console.error('Error creating research paper:', err);
-		res.status(500).send('Internal Server Error');
-	}
+        res.status(200).send('Research Paper added successfully');
+    } catch (err) {
+        console.error('Error creating research paper:', err);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
 router.get('/researchpapers', isAuthenticated, async (req, res) => {

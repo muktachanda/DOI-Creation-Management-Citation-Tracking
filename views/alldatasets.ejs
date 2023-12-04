@@ -32,10 +32,11 @@
             flex-wrap: wrap;
             justify-content: center;
             padding: 20px;
+            width: 95%;
         }
 
         .card {
-            max-width: 400px;
+            width: 100%;
             margin: 10px;
             padding: 20px;
             background-color: #fff;
@@ -108,38 +109,42 @@
 <body>
     <div class="header">All Datasets</div>
     <div class="card-container">
-        <% datasets.forEach((dataset) => { %>
-        <div class="card">
-            <h2 class="card-title">
-                <%= dataset.name %>
-            </h2>
-            <p class="card-info">Author: <%= dataset.author %></p>
-            <p class="card-info">Publication Year: <%= dataset.publicationYear %></p>
-            <p class="card-info">
-                <span style="text-decoration: none; color: inherit;">File Link: </span>
-                <span style="text-decoration: underline; color: blue;"
-                    onclick="openCSVFile('<%= dataset.fileLink %>')">
-                    <%= dataset.fileLink %>
-                </span>
-            </p>
-            <p class="card-info">
-                <span style="text-decoration: none; color: inherit;">License: </span>
-                <span style="text-decoration: underline; color: blue;"
-                    onclick="openLicenseURL('<%= dataset.license.info %>')">
-                    <%= dataset.license.name %>
-                </span>
-            </p>
-            <p>
-                Generate Citations:
-                <button
-                    onclick="generateCitations('<%= dataset.name %>','<%= dataset.author %>', '<%= dataset.publicationYear %>', 'vancouver', '<%= dataset.fileLink %>')">Vancouver</button>
-                <button
-                    onclick="generateCitations('<%= dataset.name %>', '<%= dataset.author %>', '<%= dataset.publicationYear %>', 'bibtex', '<%= dataset.fileLink %>')">BibTeX</button>
-                <button
-                    onclick="generateCitations('<%= dataset.name %>', '<%= dataset.author %>', '<%= dataset.publicationYear %>', 'american', '<%= dataset.fileLink %>')">American</button>
-            </p>
-        </div>
-        <% }); %>
+        <% datasets.forEach((dataset)=> { %>
+            <div class="card">
+                <h2 class="card-title">
+                    <%= dataset.name %>
+                </h2>
+                <p class="card-info">Author: <%= dataset.author %>
+                </p>
+                <p class="card-info">Publication Year: <%= dataset.publicationYear %>
+                </p>
+                <p class="card-info">Number of Times Referenced: <%= dataset.count %>
+                </p>
+                <p class="card-info">
+                    <span style="text-decoration: none; color: inherit;">File Link: </span>
+                    <span style="text-decoration: underline; color: blue;"
+                        onclick="openCSVFile('<%= dataset.fileLink %>')">
+                        <%= dataset.fileLink %>
+                    </span>
+                </p>
+                <p class="card-info">
+                    <span style="text-decoration: none; color: inherit;">License: </span>
+                    <span style="text-decoration: underline; color: blue;"
+                        onclick="openLicenseURL('<%= dataset.license.info %>')">
+                        <%= dataset.license.name %>
+                    </span>
+                </p>
+                <p>
+                    Generate Citations:
+                    <button
+                        onclick="generateCitations('<%= dataset.name %>','<%= dataset.author %>', '<%= dataset.publicationYear %>', 'vancouver', '<%= dataset.fileLink %>')">Vancouver</button>
+                    <button
+                        onclick="generateCitations('<%= dataset.name %>', '<%= dataset.author %>', '<%= dataset.publicationYear %>', 'bibtex', '<%= dataset.fileLink %>')">BibTeX</button>
+                    <button
+                        onclick="generateCitations('<%= dataset.name %>', '<%= dataset.author %>', '<%= dataset.publicationYear %>', 'american', '<%= dataset.fileLink %>')">American</button>
+                </p>
+            </div>
+            <% }); %>
     </div>
 
     <div class="slider-container">
@@ -196,8 +201,69 @@
         }
 
         function openLicenseURL(url) {
-            window.open(url, '_blank');
+            const isValidURL = validateURL(url);
+            if (isValidURL) {
+                window.open(url, '_blank');
+            } else {
+                const newPage = window.open('', '_blank');
+                newPage.document.write(`
+                <html>
+                    <head>
+                        <title>License Information</title>
+                        <style>
+                            body {
+                                font-family: Arial, sans-serif;
+                                background-color: #f8f9fa;
+                                margin: 0;
+                                padding: 0;
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                justify-content: flex-start;
+                                min-height: 100vh;
+                            }
+
+                            .header {
+                                background-color: #007bff;
+                                color: #fff;
+                                text-align: center;
+                                padding: 10px;
+                                font-size: 24px;
+                                border-top-left-radius: 8px;
+                                border-top-right-radius: 8px;
+                                width: 100%;
+                            }
+
+                            .card {
+                                max-width: 400px;
+                                padding: 20px;
+                                background-color: #fff;
+                                border: 1px solid #ccc;
+                                border-radius: 5px;
+                                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                            }
+
+                            .card-info {
+                                color: #333;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">License Information</div><br><br><br>
+                        <div class="card">
+                            <p class="card-info">${url}</p>
+                        </div>
+                    </body>
+                    </html>
+            `);
+            }
         }
+
+        function validateURL(url) {
+            const urlPattern = /^(https?:\/\/)?([\w.]+)\.([a-z]{2,})(\/[\w .-]*)*\/?$/i;
+            return urlPattern.test(url);
+        }
+
 
         function openCSVFile(filename) {
             const fileURL = `/openDataset/${filename}`;
