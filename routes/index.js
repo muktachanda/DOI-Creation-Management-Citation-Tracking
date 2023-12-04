@@ -1,11 +1,13 @@
 var express = require('express');
+var app = express()
 var router = express.Router();
 var User = require('../models/user');
 var License = require('../models/license');
-var Dataset = require('../models/dataset');
+var {Dataset} = require('../models/dataset');
 const {gfs, upload} = require('../server');
 const path = require('path');
 var fs = require('fs');
+const { getDOIsFromPDF } = require('../utils/pdfUtils');
 
 router.get('/', function (req, res, next) {
 	return res.render('index.ejs');
@@ -117,7 +119,8 @@ router.post('/admin/accept-license/:id', async (req, res) => {
 		const License = require('../models/license');
 		await License.findByIdAndUpdate(licenseId, { pending: false });
 
-		res.redirect('/admin');
+		const licenses = await License.find({ pending: true });
+		return res.render('admin.ejs', { licenses });
 	} catch (err) {
 		console.error('Error accepting license:', err);
 		res.status(500).send('Internal Server Error');
@@ -125,18 +128,19 @@ router.post('/admin/accept-license/:id', async (req, res) => {
 });
 
 router.post('/admin/deny-license/:id', async (req, res) => {
-	try {
-		const licenseId = req.params.id;
+    try {
+        const licenseId = req.params.id;
 
-		// Update the license's pending status to false
-		const License = require('../models/license');
-		await License.findByIdAndUpdate(licenseId, { pending: false });
+        // Remove the license
+        const License = require('../models/license');
+        await License.findByIdAndRemove(licenseId);
 
-		res.redirect('/admin');
-	} catch (err) {
-		console.error('Error denying license:', err);
-		res.status(500).send('Internal Server Error');
-	}
+        const licenses = await License.find({ pending: true });
+		return res.render('admin.ejs', { licenses });
+    } catch (err) {
+        console.error('Error denying license:', err);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
 
@@ -159,12 +163,10 @@ router.get('/forgetpass', function (req, res, next) {
 });
 
 router.post('/forgetpass', function (req, res, next) {
-	//console.log('req.body');
-	//console.log(req.body);
 	User.findOne({ email: req.body.email }, function (err, data) {
 		console.log(data);
 		if (!data) {
-			res.send({ "Success": "This Email Is not regestered!" });
+			res.send({ "Success": "This Email Is not registered!" });
 		} else {
 			// res.send({"Success":"Success!"});
 			if (req.body.password == req.body.passwordConf) {
@@ -192,7 +194,6 @@ router.get('/add-dataset', isAuthenticated, async (req, res) => {
 		// Fetch license names from MongoDB
 		const License = require('../models/license');
 		const licenses = await License.find({ pending: false }, 'name').exec();
-		console.log('Licenses:', licenses);
 
 		// Render the 'dataset.ejs' template and pass the 'licenses' data
 		res.render('dataset.ejs', { licenses });
@@ -205,10 +206,8 @@ router.get('/add-dataset', isAuthenticated, async (req, res) => {
 
 router.post('/add-dataset', upload.single('csvFile'), async (req, res) => {
 	try {
-		const { name, license } = req.body;
+		const { name, author, year, license } = req.body;
 		const count = 0;
-
-		console.log(req.file); // Log the uploaded file information for debugging
 
 		const License = require('../models/license');
 		const { Dataset } = require('../models/dataset');
@@ -227,15 +226,29 @@ router.post('/add-dataset', upload.single('csvFile'), async (req, res) => {
 			return;
 		}
 
+		const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+		const doiLength = 10;
+	
+		let doi = 'doi:';
+		for (let i = 0; i < doiLength; i++) {
+			const randomIndex = Math.floor(Math.random() * characters.length);
+			doi += characters.charAt(randomIndex);
+		}
+
 		// Create the new dataset with the file name
 		const newDataset = new Dataset({
-			name,
+			name: name,
+			author: author,
+			publicationYear: year,
 			fileLink: req.file.originalname,
-			count,
+			count: count,
 			license: foundLicense._id,
+			doi: doi,
 		});
+		console.log(newDataset)
 
 		await newDataset.save();
+
 
 		const localFilePath = path.join(__dirname, '..', 'data', req.file.originalname);
 		fs.writeFileSync(localFilePath, req.file.buffer);
@@ -245,6 +258,18 @@ router.post('/add-dataset', upload.single('csvFile'), async (req, res) => {
 		console.error('Error creating dataset:', err);
 		res.status(500).send('Internal Server Error');
 	}
+});
+
+router.get('/openDataset/:filename', (req, res) => {
+    const filename = req.params.filename;
+    const filePath = path.join(__dirname, '..', 'data', filename);
+
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send('Error opening the file.');
+        }
+    });
 });
 
 
@@ -287,6 +312,79 @@ router.get('/datasets', isAuthenticated, async (req, res) => {
 		console.error('Error loading datasets:', err);
 		res.status(500).send('Internal Server Error');
 	}
+});
+
+router.get('/add-paper', isAuthenticated, async (req, res) => {
+	try {
+		res.render('paper.ejs');
+	} catch (err) {
+		console.error('Error fetching research papers:', err);
+		res.status(500).send('Internal Server Error');
+	}
+});
+
+router.post('/add-paper', upload.single('pdfFile'), async (req, res) => {
+    try {
+        const { name } = req.body;
+
+        // Check if file is uploaded
+        if (!req.file) {
+            res.status(400).send('No file uploaded');
+            return;
+        }
+		
+		const {ResearchPaper} = require('../models/paper');
+        // Create the new paper with the file name
+        const newPaper = new ResearchPaper({
+            name: name,
+            fileLink: req.file.originalname,
+        });
+
+        await newPaper.save();
+
+        const localFilePath = path.join(__dirname, '..', 'papers', req.file.originalname);
+        fs.writeFileSync(localFilePath, req.file.buffer);
+
+        // Extract DOI from the PDF
+        const dois = await getDOIsFromPDF(localFilePath);
+
+        // Update datasets with the matching DOI
+        if (dois) {
+            await Dataset.updateMany({ doi: { $in: dois } }, { $inc: { count: 1 } });
+        }
+
+        res.status(200).send('Research Paper added successfully');
+    } catch (err) {
+        console.error('Error creating research paper:', err);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.get('/researchpapers', isAuthenticated, async (req, res) => {
+	try {
+		// Retrieve all datasets, populating the 'license' field to get license details
+		const ResearchPaper = require('../models/paper');
+		const papers = await ResearchPaper.find().exec();
+		console.log(papers);
+
+		res.render("allpapers.ejs", { papers });
+	} catch (err) {
+		console.error('Error loading papers:', err);
+		res.status(500).send('Internal Server Error');
+	}
+});
+
+
+router.get('/openPaper/:filename', (req, res) => {
+    const filename = req.params.filename;
+    const filePath = path.join(__dirname, '..', 'papers', filename);
+
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send('Error opening the file.');
+        }
+    });
 });
 
 

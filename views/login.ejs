@@ -1,68 +1,137 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<title>Login</title>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js">
-	</script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<link rel="stylesheet" href="./css/main.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <!-- Bootstrap CSS theme link -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- Custom CSS link -->
+    <link rel="stylesheet" href="./css/main.css">
 
-	<script type="text/javascript">
-		$(document).ready(function(){
+    <!-- jQuery and Bootstrap JS scripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-			$( "#form" ).submit(function(event) {
-				event.preventDefault();
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
 
-				$.ajax({
-					type: 'POST',
-					url: '/login',
-					data: $('#form').serialize(),
-					dataType: "json",
-					success: function(response){
-						//alert("a");
-						//console.log(response.Success);
-						$('#form')[0].reset();
+        .container {
+            margin-top: 50px;
+        }
 
-						document.getElementById("check").innerHTML=response.Success;
-         					//ADD THIS CODE
-         					setTimeout(function(){
-         						document.getElementById("check").innerHTML="";
-         					},3000);
-         					if (response.Success=="Success!") {
-         						document.getElementById("aa").click();
-         					};
-         				},
-         				error: function() {
-         				}
-         			})
-			});
+        .form-container {
+            background-color: #ffffff;
+            box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.1);
+            padding: 30px;
+            border-radius: 8px;
+        }
 
-		});
-	</script>
+        h2 {
+            color: #333;
+        }
+
+        .form-control {
+            border-radius: 4px;
+        }
+
+        .btn-login {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        .btn-login:hover {
+            background-color: #218838;
+        }
+
+        .alert {
+            display: none; /* Initially hide the entire alert div */
+            border-radius: 4px;
+        }
+
+        .forgot-password,
+        .create-account {
+            margin-top: 10px;
+            color: #333;
+        }
+    </style>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $( "#form" ).submit(function(event) {
+                event.preventDefault();
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/login',
+                    data: $('#form').serialize(),
+                    dataType: "json",
+                    success: function(response){
+                        $('#form')[0].reset();
+                        document.getElementById("check").innerHTML = response.Success;
+
+                        // Make the entire alert div visible
+                        $(".alert").show();
+
+                        setTimeout(function(){
+                            document.getElementById("check").innerHTML = "";
+                            // Hide the entire alert div again
+                            $(".alert").hide();
+                        }, 3000);
+
+                        if (response.Success == "Success!") {
+                            document.getElementById("aa").click();
+                        };
+                    },
+                    error: function() {
+                    }
+                })
+            });
+        });
+    </script>
 </head>
 <body>
-	<div class="col-md-4 col-md-offset-4">
-		<div>
-			<p>Login</p>
-		</div>
-		<div class="form-group">
-			<form id="form" method="post" >
-				<input type="text" name="email" placeholder="E-mail" required="" class="form-control"><br/>
-				<input type="password" name="password" placeholder="Password" required="" class="form-control"><br/>
-				<input type="submit" value="Login" class="btn btn-success">
-			</form>
-		</div>
-		<div class="mssg bg-danger">
-			<span id="check" ></span>
-		</div>
-		<div id="LangTable"><a href="/profile" id="aa"></a>
-		</div>
-		<div><span>Do you forgot password?</span><a href="/forgetpass">Click here</a>
-		<div><span>Create a new Account?</span><a href="/">Register here</a>
 
-		</div>
-		
-	</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3 form-container">
+                <div class="text-center">
+                    <h2>Login</h2>
+                </div>
+                <form id="form" method="post">
+                    <div class="form-group">
+                        <input type="text" name="email" placeholder="E-mail" required="" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" name="password" placeholder="Password" required="" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-login">Login</button>
+                    </div>
+                </form>
+                <div class="alert alert-danger mt-3">
+                    <!-- Initially hidden alert div -->
+                    <span id="check"></span>
+                </div>
+                <div id="LangTable" class="text-center">
+                    <a href="/profile" id="aa"></a>
+                </div>
+                <div class="forgot-password text-center">
+                    <span>Forgot your password? <a href="/forgetpass">Click here</a></span>
+                </div>
+                <div class="create-account text-center">
+                    <span>Create a new account? <a href="/">Register here</a></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>

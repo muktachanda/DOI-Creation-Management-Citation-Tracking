@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Research Papers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            font-size: 24px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            width: 100%;
+        }
+
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            width: 95%;
+            margin: 10px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #007bff;
+        }
+
+        .card-info {
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        All Research Papers
+    </div>
+
+    <% papers.forEach((paper) => { %>
+    <div class="card">
+        <h2 class="card-title">
+            <%= paper.name %>
+        </h2>
+        <p>
+            <strong>File Link:</strong>
+            <a class="file-link" onclick="openPDFFile('<%= paper.fileLink %>')">
+                <%= paper.fileLink %>
+            </a>
+        </p>
+    </div>
+    <% }); %>
+
+    <script>
+        function openPDFFile(filename) {
+            const fileURL = `/openPaper/${filename}`;
+            console.log('File URL', fileURL);
+            window.open(fileURL, '_blank');
+        }
+    </script>
+</body>
+
+</html>

@@ -1,32 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
-    <link rel="stylesheet" type="text/css" href="path/to/your/styles.css">
+    <!-- Bootstrap CSS theme link -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- Custom CSS link -->
+    <link rel="stylesheet" href="path/to/your/styles.css">
     <!-- Add any additional styles or libraries as needed -->
 </head>
 <body>
-    <h1>Admin Panel</h1>
-    <ul>
-        <% licenses.forEach((license) => { %>
-        <li>
-            <strong>License Name:</strong> <%= license.name %><br>
-            <strong>License Info:</strong> <%= license.info %><br>
-            <strong>Status:</strong> 
-            <% if (license.pending) { %>
-                <span style="color: orange;">Pending</span>
-                <form method="POST" action="/admin/accept-license/<%= license._id %>">
-                    <button type="submit">Accept</button>
-                </form>
-                <form method="POST" action="/admin/deny-license/<%= license._id %>">
-                    <button type="submit">Deny</button>
-                </form>
-            <% } else { %>
-                <span style="color: green;">Accepted</span>
-            <% } %>
-            <hr>
-        </li>
-        <% }); %>
-    </ul>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <div class="text-right">
+                    <a href="/login" class="btn btn-link">Logout</a>
+                </div>
+                <h1 class="text-center">Admin Panel</h1>
+                <% if (licenses.length > 0) { %>
+                    <ul class="list-group">
+                        <% licenses.forEach((license) => { %>
+                        <li class="list-group-item">
+                            <h4 class="list-group-item-heading">License Name: <%= license.name %></h4>
+                            <p class="list-group-item-text">
+                                <strong>License Info:</strong> <%= license.info %><br>
+                                <strong>Status:</strong> 
+                                <% if (license.pending) { %>
+                                    <span class="label label-warning">Pending</span>
+                                    <form class="form-inline" method="POST" action="/admin/accept-license/<%= license._id %>">
+                                        <button type="submit" class="btn btn-success">Accept</button>
+                                    </form>
+                                    <form class="form-inline" method="POST" action="/admin/deny-license/<%= license._id %>">
+                                        <button type="submit" class="btn btn-danger">Deny</button>
+                                    </form>
+                                <% } else { %>
+                                    <span class="label label-success">Accepted</span>
+                                <% } %>
+                            </p>
+                        </li>
+                        <% }); %>
+                    </ul>
+                <% } else { %>
+                    <div class="text-center">
+                        <p class="lead">No pending approvals at the moment.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
