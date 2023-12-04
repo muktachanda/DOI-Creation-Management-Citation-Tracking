@@ -59,6 +59,7 @@
         .card-info {
             color: #333;
         }
+
     </style>
 </head>
 
@@ -74,7 +75,7 @@
         </h2>
         <p>
             <strong>File Link:</strong>
-            <a class="file-link" onclick="openPDFFile('<%= paper.fileLink %>')">
+            <a class="file-link" style="text-decoration: underline; color: blue;" onclick="openPDFFile('<%= paper.fileLink %>')">
                 <%= paper.fileLink %>
             </a>
         </p>
