@@ -10,6 +10,10 @@ var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
 require('dotenv').config();
 const dbURL = process.env.URL;
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage});
+module.exports = {upload: upload};
 
 mongoose.connect(dbURL, {
   useNewUrlParser: true,

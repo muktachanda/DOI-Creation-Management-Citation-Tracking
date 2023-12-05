@@ -6,6 +6,7 @@ var License = require('../models/license');
 var {Dataset} = require('../models/dataset');
 const path = require('path');
 var fs = require('fs');
+const {upload} = require('../server');
 const { getDOIsFromPDF } = require('../utils/pdfUtils');
 
 // get registration page
