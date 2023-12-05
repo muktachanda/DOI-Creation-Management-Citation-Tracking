@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Research Papers</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -35,7 +36,7 @@
         }
 
         .card {
-            width: 95%;
+            width: 80%;
             margin: 10px;
             padding: 20px;
             background-color: #fff;
@@ -60,27 +61,61 @@
             color: #333;
         }
 
+        .card-canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
     </style>
 </head>
 
 <body>
     <div class="header">
         All Research Papers
-    </div>
+    </div><br><br>
 
     <% papers.forEach((paper) => { %>
-    <div class="card">
-        <h2 class="card-title">
-            <%= paper.name %>
-        </h2>
-        <p>
-            <strong>File Link:</strong>
-            <a class="file-link" style="text-decoration: underline; color: blue;" onclick="openPDFFile('<%= paper.fileLink %>')">
-                <%= paper.fileLink %>
-            </a>
-        </p>
-    </div>
+        <div class="card">
+            <h2 class="card-title">
+                <%= paper.name %>
+            </h2>
+
+            <p class="card-info">
+                Author: <%= paper.author %>
+            </p>
+    
+            <canvas class="card-canvas" id="pdfPreview_<%= paper._id %>" onclick="openPDFFile(`<%= paper.fileLink %>`)"></canvas>
+    
+            <script>
+                // JavaScript to render PDF preview
+                document.addEventListener('DOMContentLoaded', function () {
+                    const paperId_<%= paper._id %> = '<%= paper._id %>'; // Updated line
+                    const filename_<%= paper._id %> = '<%= paper.fileLink %>';
+                    const canvas_<%= paper._id %> = document.getElementById('pdfPreview_<%= paper._id %>');
+                    const fileURL_<%= paper._id %> = `/openPaper/${filename_<%= paper._id %>}`;
+    
+                    // Initialize PDF.js
+                    pdfjsLib.getDocument(fileURL_<%= paper._id %>).promise.then(function (pdf) {
+                        // Fetch the first page
+                        return pdf.getPage(1);
+                    }).then(function (page) {
+                        const viewport = page.getViewport({ scale: 0.5 });
+                        canvas_<%= paper._id %>.width = viewport.width;
+                        canvas_<%= paper._id %>.height = viewport.height;
+    
+                        // Render PDF page into the canvas
+                        const context = canvas_<%= paper._id %>.getContext('2d');
+                        const renderContext = {
+                            canvasContext: context,
+                            viewport: viewport
+                        };
+                        page.render(renderContext);
+                    });
+                });
+            </script>
+        </div>
     <% }); %>
+    
 
     <script>
         function openPDFFile(filename) {

@@ -4,16 +4,16 @@ var router = express.Router();
 var User = require('../models/user');
 var License = require('../models/license');
 var {Dataset} = require('../models/dataset');
-const {gfs, upload} = require('../server');
 const path = require('path');
 var fs = require('fs');
 const { getDOIsFromPDF } = require('../utils/pdfUtils');
 
+// get registration page
 router.get('/', function (req, res, next) {
 	return res.render('index.ejs');
 });
 
-
+// register a user
 router.post('/', function (req, res, next) {
 	console.log(req.body);
 	var personInfo = req.body;
@@ -64,10 +64,12 @@ router.post('/', function (req, res, next) {
 	}
 });
 
+// get login page
 router.get('/login', function (req, res, next) {
 	return res.render('login.ejs');
 });
 
+// allow user to login
 router.post('/login', function (req, res, next) {
 	const { email, password } = req.body;
 
@@ -85,7 +87,7 @@ router.post('/login', function (req, res, next) {
 	});
 });
 
-
+// function that protects all routes after the login page
 function isAuthenticated(req, res, next) {
 	if (req.session && req.session.userId) {
 		next();
@@ -94,6 +96,7 @@ function isAuthenticated(req, res, next) {
 	}
 }
 
+// get the user dashboard page
 router.get('/profile', isAuthenticated, async (req, res) => {
 	User.findOne({ unique_id: req.session.userId }, async function (err, data) {
 		console.log(data);
@@ -105,13 +108,13 @@ router.get('/profile', isAuthenticated, async (req, res) => {
 			return res.render('admin.ejs', { licenses });
 		} else {
 			console.log(data);
-			return res.render('data.ejs', { "name": data.username, "email": data.email });
+			return res.render('profile.ejs', { "name": data.username, "email": data.email, alertMessage: req.query.alert });
 		}
 	});
 });
 
-
-router.post('/admin/accept-license/:id', async (req, res) => {
+// allow the admin to accept license
+router.post('/admin/accept-license/:id', isAuthenticated, async (req, res) => {
 	try {
 		const licenseId = req.params.id;
 
@@ -127,7 +130,8 @@ router.post('/admin/accept-license/:id', async (req, res) => {
 	}
 });
 
-router.post('/admin/deny-license/:id', async (req, res) => {
+// allow the admin to deny license
+router.post('/admin/deny-license/:id', isAuthenticated, async (req, res) => {
     try {
         const licenseId = req.params.id;
 
@@ -143,7 +147,7 @@ router.post('/admin/deny-license/:id', async (req, res) => {
     }
 });
 
-
+// logout
 router.get('/logout', function (req, res, next) {
 	console.log("logout")
 	if (req.session) {
@@ -152,16 +156,18 @@ router.get('/logout', function (req, res, next) {
 			if (err) {
 				return next(err);
 			} else {
-				return res.redirect('/');
+				return res.redirect('/login');
 			}
 		});
 	}
 });
 
+// get forget password page
 router.get('/forgetpass', function (req, res, next) {
 	res.render("forget.ejs");
 });
 
+// change password
 router.post('/forgetpass', function (req, res, next) {
 	User.findOne({ email: req.body.email }, function (err, data) {
 		console.log(data);
@@ -188,7 +194,7 @@ router.post('/forgetpass', function (req, res, next) {
 
 });
 
-
+// get the add dataset form page
 router.get('/add-dataset', isAuthenticated, async (req, res) => {
 	try {
 		// Fetch license names from MongoDB
@@ -203,8 +209,8 @@ router.get('/add-dataset', isAuthenticated, async (req, res) => {
 	}
 });
 
-
-router.post('/add-dataset', upload.single('csvFile'), async (req, res) => {
+// add the dataset to mongodb
+router.post('/add-dataset', isAuthenticated, upload.single('csvFile'), async (req, res) => {
 	try {
 		const { name, author, year, license } = req.body;
 		const count = 0;
@@ -253,14 +259,15 @@ router.post('/add-dataset', upload.single('csvFile'), async (req, res) => {
 		const localFilePath = path.join(__dirname, '..', 'data', req.file.originalname);
 		fs.writeFileSync(localFilePath, req.file.buffer);
 
-		res.status(200).send('Dataset created successfully');
+		res.redirect('/profile?alert=success');
 	} catch (err) {
 		console.error('Error creating dataset:', err);
 		res.status(500).send('Internal Server Error');
 	}
 });
 
-router.get('/openDataset/:filename', (req, res) => {
+// download the dataset
+router.get('/openDataset/:filename', isAuthenticated, (req, res) => {
     const filename = req.params.filename;
     const filePath = path.join(__dirname, '..', 'data', filename);
 
@@ -272,12 +279,13 @@ router.get('/openDataset/:filename', (req, res) => {
     });
 });
 
-
+// get the custom license form page
 router.get('/custom-license', isAuthenticated, async (req, res) => {
 	res.render('customLicense.ejs');
 })
 
-router.post('/custom-license', async (req, res) => {
+// send custom license for approval
+router.post('/custom-license', isAuthenticated, async (req, res) => {
 	try {
 		const { name, info } = req.body;
 		const pending = true;
@@ -292,14 +300,14 @@ router.post('/custom-license', async (req, res) => {
 		// Save the license to the database
 		await newLicense.save();
 
-
-		res.status(200).send('Template sent for approval');
+		res.status(200).send('Template sent for approval...');
 	} catch (err) {
 		console.error('Error creating custom license:', err);
 		res.status(500).send('Internal Server Error');
 	}
 });
 
+// get all datasets
 router.get('/datasets', isAuthenticated, async (req, res) => {
 	try {
 		// Retrieve all datasets, populating the 'license' field to get license details
@@ -314,6 +322,7 @@ router.get('/datasets', isAuthenticated, async (req, res) => {
 	}
 });
 
+// get the add paper form page
 router.get('/add-paper', isAuthenticated, async (req, res) => {
 	try {
 		res.render('paper.ejs');
@@ -323,9 +332,10 @@ router.get('/add-paper', isAuthenticated, async (req, res) => {
 	}
 });
 
-router.post('/add-paper', upload.single('pdfFile'), async (req, res) => {
+// add the paper to mongodb
+router.post('/add-paper', isAuthenticated, upload.single('pdfFile'), async (req, res) => {
     try {
-        const { name } = req.body;
+        const { name, author } = req.body;
 
         // Check if file is uploaded
         if (!req.file) {
@@ -337,6 +347,7 @@ router.post('/add-paper', upload.single('pdfFile'), async (req, res) => {
         // Create the new paper with the file name
         const newPaper = new ResearchPaper({
             name: name,
+			author: author,
             fileLink: req.file.originalname,
         });
 
@@ -352,13 +363,14 @@ router.post('/add-paper', upload.single('pdfFile'), async (req, res) => {
             await Dataset.updateMany({ doi: { $in: dois } }, { $inc: { count: 1 } });
         }
 
-        res.status(200).send('Research Paper added successfully');
+        res.redirect('/profile?alert=success');
     } catch (err) {
         console.error('Error creating research paper:', err);
         res.status(500).send('Internal Server Error');
     }
 });
 
+// get all research papers
 router.get('/researchpapers', isAuthenticated, async (req, res) => {
 	try {
 		// Retrieve all datasets, populating the 'license' field to get license details
@@ -373,8 +385,8 @@ router.get('/researchpapers', isAuthenticated, async (req, res) => {
 	}
 });
 
-
-router.get('/openPaper/:filename', (req, res) => {
+// open a research paper
+router.get('/openPaper/:filename', isAuthenticated, (req, res) => {
     const filename = req.params.filename;
     const filePath = path.join(__dirname, '..', 'papers', filename);
 
@@ -385,6 +397,5 @@ router.get('/openPaper/:filename', (req, res) => {
         }
     });
 });
-
 
 module.exports = router;

@@ -84,6 +84,15 @@
 
     <div class="container">
         <div class="tab-content">
+            <div id="alert" class="alert alert-success alert-dismissible" role="alert" style="margin-top: 10px; display: none;">
+                <!-- Message content goes here -->
+                Added into the portal successfully!
+                <!-- Close button for the alert -->
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
             <!-- Add Dataset Tab -->
             <div id="addDataset" class="tab-pane fade in active">
                 <a href="/add-dataset">Add Dataset</a>
@@ -111,4 +120,18 @@
         </div>
     </div>
 </body>
+
+<script>
+    // JavaScript to show the alert when the page loads
+    $(document).ready(function () {
+        // Check if the URL has a success parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const alertParam = urlParams.get('alert');
+
+        // If the success parameter is present, show the alert
+        if (alertParam === 'success') {
+            $('#alert').show();
+        }
+    });
+</script>
 </html>

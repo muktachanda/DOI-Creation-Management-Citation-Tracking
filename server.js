@@ -10,10 +10,6 @@ var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
 require('dotenv').config();
 const dbURL = process.env.URL;
-const multer = require('multer');
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage});
-const Grid = require('gridfs-stream');
 
 mongoose.connect(dbURL, {
   useNewUrlParser: true,
@@ -39,15 +35,6 @@ app.use(session({
     mongooseConnection: db
   })
 }));
-
-// create mongodb connection stream
-let gfs;
-db.once('open', function () {
-  gfs = Grid(db.db, mongoose.mongo);
-  gfs.collection('uploads');
-  console.log("GFS initialized properly")
-});
-module.exports = {upload: upload, gfs: gfs};
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');	

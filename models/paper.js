@@ -5,6 +5,10 @@ const ResearchPaperSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    author: {
+        type: String,
+        required: true,
+    },
     fileLink: {
         type: String,
         required: true,
