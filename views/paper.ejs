@@ -11,9 +11,19 @@
             margin: 0;
             padding: 0;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100vh;
+        }
+
+        .header {
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            font-size: 24px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            width: 100%;
         }
 
         .card {
@@ -65,9 +75,9 @@
     </style>
 </head>
 <body>
+    <div class="header">Add Research Paper</div><br><br>
     <div class="card">
         <div class="card-body">
-            <h1 class="card-title">Add Research Paper</h1>
             <form method="POST" action="/add-paper" enctype="multipart/form-data">
                 <label for="name">Name:</label>
                 <input type="text" name="name" required>

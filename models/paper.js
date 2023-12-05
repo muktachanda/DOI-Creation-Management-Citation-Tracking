@@ -13,4 +13,4 @@ const ResearchPaperSchema = new mongoose.Schema({
 
 const ResearchPaper = mongoose.model('ResearchPaper', ResearchPaperSchema);
 
-module.exports = ResearchPaper;
+module.exports = {ResearchPaper};

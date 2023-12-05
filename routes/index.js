@@ -345,10 +345,9 @@ router.post('/add-paper', upload.single('pdfFile'), async (req, res) => {
         const localFilePath = path.join(__dirname, '..', 'papers', req.file.originalname);
         fs.writeFileSync(localFilePath, req.file.buffer);
 
-        // Extract DOI from the PDF
         const dois = await getDOIsFromPDF(localFilePath);
+		console.log(dois);
 
-        // Update datasets with the matching DOI
         if (dois) {
             await Dataset.updateMany({ doi: { $in: dois } }, { $inc: { count: 1 } });
         }
@@ -363,7 +362,7 @@ router.post('/add-paper', upload.single('pdfFile'), async (req, res) => {
 router.get('/researchpapers', isAuthenticated, async (req, res) => {
 	try {
 		// Retrieve all datasets, populating the 'license' field to get license details
-		const ResearchPaper = require('../models/paper');
+		const {ResearchPaper} = require('../models/paper');
 		const papers = await ResearchPaper.find().exec();
 		console.log(papers);
 
