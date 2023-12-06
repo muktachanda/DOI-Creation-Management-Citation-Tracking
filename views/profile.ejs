@@ -86,7 +86,7 @@
         <div class="tab-content">
             <div id="alert" class="alert alert-success alert-dismissible" role="alert" style="margin-top: 10px; display: none;">
                 <!-- Message content goes here -->
-                Added into the portal successfully!
+                <div id="message"></div>
                 <!-- Close button for the alert -->
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -129,7 +129,16 @@
         const alertParam = urlParams.get('alert');
 
         // If the success parameter is present, show the alert
-        if (alertParam === 'success') {
+        if (alertParam === 'dsuccess') {
+            document.getElementById('message').innerHTML = "Dataset Added Successfully!"
+            $('#alert').show();
+        }
+        else if(alertParam === 'psuccess') {
+            document.getElementById('message').innerHTML = "Research Paper Added Successfully!"
+            $('#alert').show();
+        }
+        else if(alertParam === 'lsuccess') {
+            document.getElementById('message').innerHTML = "License Template Sent to Admin for approval."
             $('#alert').show();
         }
     });

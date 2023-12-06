@@ -260,7 +260,7 @@ router.post('/add-dataset', isAuthenticated, upload.single('csvFile'), async (re
 		const localFilePath = path.join(__dirname, '..', 'data', req.file.originalname);
 		fs.writeFileSync(localFilePath, req.file.buffer);
 
-		res.redirect('/profile?alert=success');
+		res.redirect('/profile?alert=dsuccess');
 	} catch (err) {
 		console.error('Error creating dataset:', err);
 		res.status(500).send('Internal Server Error');
@@ -301,7 +301,7 @@ router.post('/custom-license', isAuthenticated, async (req, res) => {
 		// Save the license to the database
 		await newLicense.save();
 
-		res.status(200).send('Template sent for approval...');
+		res.redirect('/profile?alert=lsuccess');
 	} catch (err) {
 		console.error('Error creating custom license:', err);
 		res.status(500).send('Internal Server Error');
@@ -364,7 +364,7 @@ router.post('/add-paper', isAuthenticated, upload.single('pdfFile'), async (req,
             await Dataset.updateMany({ doi: { $in: dois } }, { $inc: { count: 1 } });
         }
 
-        res.redirect('/profile?alert=success');
+        res.redirect('/profile?alert=psuccess');
     } catch (err) {
         console.error('Error creating research paper:', err);
         res.status(500).send('Internal Server Error');
