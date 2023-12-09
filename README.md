@@ -46,14 +46,27 @@ fileLink
 ```
 
 ## Instructions to Run:
+- Create a file in the root folder and name it .env
+- Configure a MongoDB Backend server with a dummy user and include the connect url in env.
+- Go to https://acrobatservices.adobe.com/dc-integration-creation-app-cdn/main.html?api=pdf-extract-api and create credentials for Node.js. 
+- Copy the client id and client secret into the env file.
+- The final env file should finally look like this:
+```
+URL=mongodb+srv://<user>:<password>@database.<unique-database-id>.mongodb.net/
+PDF_SERVICES_CLIENT_ID=<client-id>
+PDF_SERVICES_CLIENT_SECRET=<client-secret>
+```
+- Then, to run the application, open the terminal and run:
 ```
 $ npm start
 ```
 
-### Using Docker:
+- ### Using Docker:
+- Make sure docker is configured.
+- Then run:
 ```
 docker build -t portal .
-docker run portal
+docker run -p 3000:3000 portal
 ```
 
 *Run on Ubuntu-22.04 LTS*
